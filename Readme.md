@@ -17,6 +17,24 @@ This is a Node.js Express API for Role-Based Access Control (RBAC). It provides 
 - User Login
 - Role-Based Authorization
 - Protected Routes
+- Email Notifications
+
+## Email Service
+
+This API now includes email notification capabilities, primarily used for sending welcome emails upon user registration.
+
+### Email Configuration
+
+To enable email notifications, add the following environment variables to your `.env` file:
+
+```
+SMTP_HOST=your_smtp_host
+SMTP_PORT=your_smtp_port
+SMTP_USER=your_smtp_username
+SMTP_PASSWORD=your_smtp_password
+```
+
+*Replace `your_smtp_host`, `your_smtp_port`, `your_smtp_username`, and `your_smtp_password` with your email service provider's SMTP details.*
 
 ## Installation
 

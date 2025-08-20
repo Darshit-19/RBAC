@@ -1,12 +1,11 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
-const { isMatch } = require("date-fns");
 const jwt = require("jsonwebtoken");
-const { message } = require("prompt");
+const sendMail = require('../utils/mailer')
 
 const register = async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, password, email, role } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ username });
@@ -18,7 +17,7 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create and save the user
-    const newUser = new User({ username, password: hashedPassword, role });
+    const newUser = new User({ username, password: hashedPassword, email, role });
     await newUser.save();
 
     // Generate JWT for auto-login
@@ -27,6 +26,10 @@ const register = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+    
+    await sendMail(email,
+      "Welcome to RBAC System",
+      `Hi ${username}, your account has been successfully created!`)
 
     // Send response with token
     res.status(201).json({

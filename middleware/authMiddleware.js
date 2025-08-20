@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const { message } = require('prompt')
+
 
 const verifyToken = (req,res,next) => {
     let token
