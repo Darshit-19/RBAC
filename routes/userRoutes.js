@@ -1,6 +1,7 @@
 const express = require("express");
 const verifyToken = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
+const {updateUser} = require('../controllers/authController')
 
 const router = express.Router();
 
@@ -18,6 +19,9 @@ router.get("/manager", verifyToken, authorizeRoles("admin", "manager"), (req, re
 router.get("/user", verifyToken, authorizeRoles("admin", "manager", "user"), (req, res) => {
   res.status(200).json({ message: "Welcome User" });
 });
+
+//Update user details (only admin can do)
+router.put("/update/:id", verifyToken ,authorizeRoles("admin"),updateUser)
 
 
 module.exports = router;

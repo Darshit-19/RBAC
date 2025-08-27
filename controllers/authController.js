@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/mailer");
 
+
 const register = async (req, res) => {
   try {
     const { username, password, email, role } = req.body;
@@ -106,7 +107,7 @@ const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: "OTP and tempToken required" });
 
     // Verify tempToken
-    let decoded
+    let decoded;
     try {
       decoded = jwt.verify(tempToken, process.env.JWT_SECRET);
     } catch (error) {
@@ -122,7 +123,7 @@ const verifyOtp = async (req, res) => {
     const user = await User.findById(decoded.id);
     if (!user || !user.otp || !user.otpExpiry)
       return res
-        .json(404)
+        .status(404)
         .json({ message: "No OTP found. Please login again." });
 
     // Check expiry
@@ -152,10 +153,41 @@ const verifyOtp = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ message: "Login Succesfully" });
+    res.status(200).json({ message: "Login Succesfully" , token});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
-module.exports = { register, login, verifyOtp };
+
+const updateUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const findUser = await User.findById(id);
+
+    if (!findUser) return res.status(404).json({ message: "User not found" });
+
+    const {  email, role } = req.body;
+
+    
+    if (email) findUser.email = email;
+    if (role) findUser.role = role;
+    await findUser.save();
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: {
+        id: findUser._id,
+        username: findUser.username,
+        email: findUser.email,
+        role: findUser.role,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+module.exports = { register, login, verifyOtp, updateUser };
